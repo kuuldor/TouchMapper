@@ -15,4 +15,5 @@
     <string name="axis_ltrigger">AXIS_LTRIGGER (17): %1$.4f</string>
     <string name="axis_throttle">AXIS_THROTTLE (19): %1$.4f</string>
     <string name="axis_brake">AXIS_BRAKE (23): %1$.4f</string>
+    <string name="axis_gas">AXIS_GAS (22): %1$.4f</string>
 </resources>

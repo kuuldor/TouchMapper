@@ -102,8 +102,15 @@
         android:id="@+id/axisBreakTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/axis_throttle"
+        android:text="@string/axis_brake"
         android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/axisGasTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/axis_gas"
+        android:textSize="16sp" />
 
 
     <!--<LinearLayout-->

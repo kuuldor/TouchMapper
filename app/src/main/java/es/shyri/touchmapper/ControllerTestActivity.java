@@ -31,6 +31,7 @@ public class ControllerTestActivity extends AppCompatActivity {
     TextView axisLTriggerTextView;
     TextView axisThrottleTextView;
     TextView axisBreakTextView;
+    TextView axisGasTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class ControllerTestActivity extends AppCompatActivity {
         axisLTriggerTextView = (TextView) findViewById(R.id.axisLTriggerTextView);
         axisThrottleTextView = (TextView) findViewById(R.id.axisThrottleTextView);
         axisBreakTextView = (TextView) findViewById(R.id.axisBreakTextView);
+        axisGasTextView = (TextView) findViewById(R.id.axisGasTextView);
     }
 
     @Override
@@ -64,13 +66,11 @@ public class ControllerTestActivity extends AppCompatActivity {
                 event.getKeyCode() != KeyEvent.KEYCODE_DEL && event.getKeyCode() != KeyEvent.KEYCODE_SPACE &&
                 event.getKeyCode() != KeyEvent.KEYCODE_SPACE) {
                 pressedKeyTextView.setText(getString(R.string.pressed_key, event.getKeyCode()));
-            }
-            if (handled) {
-                return true;
+                handled = true;
             }
         }
 
-        return super.onKeyDown(keyCode, event);
+        return handled;
     }
 
     @Override
@@ -118,6 +118,8 @@ public class ControllerTestActivity extends AppCompatActivity {
         axisThrottleTextView.setText(getString(R.string.axis_throttle, axis_throttle));
         float axis_brake = getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_BRAKE, historyPos);
         axisBreakTextView.setText(getString(R.string.axis_brake, axis_brake));
+        float axis_gas = getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_GAS, historyPos);
+        axisGasTextView.setText(getString(R.string.axis_gas, axis_gas));
 
     }
 
