@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,6 +30,8 @@ public class OverlayService extends Service implements OnTouchListener {
 
     private View floatyView;
 
+    private LayoutParams params;
+
     @Override
     public IBinder onBind(Intent intent) {
 
@@ -46,20 +49,27 @@ public class OverlayService extends Service implements OnTouchListener {
     }
 
     private void addOverlayView() {
+        int overlayType;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            overlayType = LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            overlayType = LayoutParams.TYPE_SYSTEM_ALERT;
 
-        final WindowManager.LayoutParams params =
-                new LayoutParams(
+        }
+        params = new LayoutParams(
                         LayoutParams.WRAP_CONTENT,
                         LayoutParams.WRAP_CONTENT,
-                        LayoutParams.TYPE_APPLICATION_OVERLAY,
+                        overlayType,
                         LayoutParams.FLAG_KEEP_SCREEN_ON
+                                | LayoutParams.FLAG_NOT_FOCUSABLE
                                 | LayoutParams.FLAG_NOT_TOUCH_MODAL
-                                | LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-                        PixelFormat.TRANSLUCENT);
+                                | LayoutParams.FLAG_HARDWARE_ACCELERATED
+                                | LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                                | LayoutParams.FLAG_SECURE,
+
+                        PixelFormat.TRANSPARENT);
 
         params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
-        params.x = 0;
-        params.y = 0;
 
         FrameLayout interceptorLayout = new FrameLayout(this) {
             @Override
@@ -90,16 +100,18 @@ public class OverlayService extends Service implements OnTouchListener {
             public boolean dispatchGenericMotionEvent(MotionEvent event) {
                 boolean handled = false;
 
-                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    final int historySize = event.getHistorySize();
-                    for (int i = 0; i < historySize; i++) {
-                        // Process the event at historical position i
-                        processJoystickInput(event, i);
+                if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+                    if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        final int historySize = event.getHistorySize();
+                        for (int i = 0; i < historySize; i++) {
+                            // Process the event at historical position i
+                            processJoystickInput(event, i);
+                        }
+
+                        processJoystickInput(event, -1);
+
+                        handled = true;
                     }
-
-                    processJoystickInput(event, -1);
-
-                    handled = true;
                 }
                 return handled;
             }
@@ -181,6 +193,8 @@ public class OverlayService extends Service implements OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Log.v(TAG, "Touched...");
+        params.flags ^= LayoutParams.FLAG_NOT_FOCUSABLE;
+        windowManager.updateViewLayout(floatyView, params);
         return true;
     }
 }
