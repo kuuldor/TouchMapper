@@ -52,6 +52,11 @@
                 android:name="android.view.im"
                 android:resource="@xml/method"/>
         </service>
+
+        <service
+            android:name=".overlay.OverlayService"
+            android:exported="false" />
+
     </application>
 
 </manifest>
