@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">TouchMapper</string>
 
+    <string name="svc_notif">Mapper Service Running...</string>
+
     <string name="device_info">Device Info</string>
     <string name="device_id">id: %s</string>
     <string name="pressed_key">key: %d</string>

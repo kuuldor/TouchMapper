@@ -19,6 +19,9 @@ import android.widget.Toast;
 import es.shyri.touchmapper.overlay.OverlayService;
 
 public class MainActivity extends AppCompatActivity {
+
+    private final static int REQUEST_CODE = 62345;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private final static int REQUEST_CODE = 62345;
 
     private void tryShowOverlay() {
 
