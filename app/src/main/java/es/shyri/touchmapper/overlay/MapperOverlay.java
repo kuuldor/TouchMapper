@@ -1,11 +1,14 @@
 package es.shyri.touchmapper.overlay;
 
 import android.content.Context;
+import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
@@ -14,13 +17,34 @@ import es.shyri.touchmapper.R;
 public class MapperOverlay extends OverlayView {
     private static final String TAG = OverlayService.class.getSimpleName();
 
-    MapperOverlay(Context context, WindowManager windowManager, WindowManager.LayoutParams params) {
-        super(context, windowManager, params);
+    public MapperOverlay(Context context, WindowManager windowManager) {
+        super(context, windowManager);
     }
 
     @Override
     protected int getFloatyViewID() {
         return R.layout.mapper_view;
+    }
+
+    @Override
+    public WindowManager.LayoutParams getDefaultLayoutParams() {
+        int overlayType = getOverlayType();
+
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                overlayType,
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+//                        | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                        | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+//                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_FULLSCREEN
+                        | WindowManager.LayoutParams.FLAG_SECURE,
+                PixelFormat.TRANSLUCENT);
+
+        return params;
     }
 
     @Override
@@ -118,7 +142,7 @@ public class MapperOverlay extends OverlayView {
         float axis_gas = getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_GAS, historyPos);
         Log.v(TAG, context.getString(R.string.axis_gas, axis_gas));
 
-        Log.v(TAG, "Metrics: "+ metrics.widthPixels + "x" + metrics.heightPixels);
+        Log.v(TAG, "Metrics: " + metrics.widthPixels + "x" + metrics.heightPixels);
     }
 
     private static float getCenteredAxis(MotionEvent event, InputDevice device, int axis, int historyPos) {

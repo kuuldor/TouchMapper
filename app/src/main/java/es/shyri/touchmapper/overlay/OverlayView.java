@@ -1,9 +1,7 @@
 package es.shyri.touchmapper.overlay;
 
 import android.content.Context;
-import android.graphics.PixelFormat;
 import android.os.Build;
-import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,22 +10,20 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import es.shyri.touchmapper.R;
-
 abstract class OverlayView  implements View.OnTouchListener {
     private static final String TAG = OverlayService.class.getSimpleName();
 
     final Context context;
     final WindowManager windowManager;
     final DisplayMetrics metrics;
-    final WindowManager.LayoutParams params;
+    protected WindowManager.LayoutParams params;
 
     View floatyView;
 
-    public OverlayView(Context context, WindowManager windowManager, WindowManager.LayoutParams params) {
+    public OverlayView(Context context, WindowManager windowManager) {
         this.context = context;
         this.windowManager = windowManager;
-        this.params = params;
+        this.params = getDefaultLayoutParams();
 
         metrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(metrics);
@@ -61,41 +57,7 @@ abstract class OverlayView  implements View.OnTouchListener {
         return new FrameLayout(context);
     }
 
-    public static WindowManager.LayoutParams getDefaultLayoutParams() {
-        WindowManager.LayoutParams params;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            params = new WindowManager.LayoutParams(
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-//                            | LayoutParams.FLAG_NOT_FOCUSABLE
-//                            | LayoutParams.FLAG_ALT_FOCUSABLE_IM
-                            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                            | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                            | WindowManager.LayoutParams.FLAG_FULLSCREEN
-                            | WindowManager.LayoutParams.FLAG_SECURE,
-                    PixelFormat.TRANSLUCENT);
-
-        } else {
-            params = new WindowManager.LayoutParams(
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-//                            | LayoutParams.FLAG_NOT_FOCUSABLE
-//                            | LayoutParams.FLAG_ALT_FOCUSABLE_IM
-                            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                            | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                            | WindowManager.LayoutParams.FLAG_FULLSCREEN
-                            | WindowManager.LayoutParams.FLAG_SECURE,
-                    PixelFormat.TRANSLUCENT);
-        }
-
-        return params;
-    }
+    public abstract WindowManager.LayoutParams getDefaultLayoutParams();
 
     protected float px, py;
 
@@ -108,6 +70,16 @@ abstract class OverlayView  implements View.OnTouchListener {
         params.x += newX - px;
         params.y += newY - py;
         windowManager.updateViewLayout(floatyView, params);
+    }
+
+    protected static int getOverlayType() {
+        int overlayType;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            overlayType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            overlayType = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        }
+        return overlayType;
     }
 
     @Override
@@ -125,5 +97,13 @@ abstract class OverlayView  implements View.OnTouchListener {
         }
 
         return true;
+    }
+
+    public WindowManager.LayoutParams getParams() {
+        return params;
+    }
+
+    public void setParams(WindowManager.LayoutParams params) {
+        this.params = params;
     }
 }

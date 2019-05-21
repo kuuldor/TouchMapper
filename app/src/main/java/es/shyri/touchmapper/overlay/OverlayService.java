@@ -3,12 +3,15 @@ package es.shyri.touchmapper.overlay;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.DisplayMetrics;
@@ -64,35 +67,47 @@ public class OverlayService extends Service {
         windowManager.getDefaultDisplay().getMetrics(metrics);
 
 
-        final String appName = getString(R.string.app_name);
-
-        String channlId;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channlId = createNotificationChannel(appName, "Overlay Service");
-        } else {
-            // If earlier version channel ID is not used
-            // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
-            channlId = appName;
-        }
-
-        notification = new NotificationCompat.Builder(this, channlId)
-                .setContentTitle(appName)
-                .setOngoing(true)
-                .setContentText(getString(R.string.svc_notif))
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setSmallIcon(R.drawable.ic_gamepad).build();
+        notification = createNotification();
 
         startForeground(notificationId, notification);
 
         addOverlayView();
     }
 
+    private Notification createNotification() {
+        final String appName = getString(R.string.app_name);
+
+        String channelId;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            channelId = createNotificationChannel(appName, "Overlay Service");
+        } else {
+            // If earlier version channel ID is not used
+            // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
+            channelId = appName;
+        }
+
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + this.getPackageName()));
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        return new NotificationCompat.Builder(this, channelId)
+                .setContentTitle(appName)
+                .setOngoing(true)
+                .setContentText(getString(R.string.svc_notif))
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setSmallIcon(R.drawable.ic_gamepad)
+                .setContentIntent(resultPendingIntent)
+                .build();
+    }
+
     private void addOverlayView() {
-        params = OverlayView.getDefaultLayoutParams();
 
+        mapperOverlay = new MapperOverlay(this, windowManager);
+
+        params = mapperOverlay.getParams();
         params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+        mapperOverlay.setParams(params);
 
-        mapperOverlay = new MapperOverlay(this, windowManager, params);
 
         mapperOverlay.addFloatyView();
     }
