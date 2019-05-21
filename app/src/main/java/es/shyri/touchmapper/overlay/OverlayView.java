@@ -11,7 +11,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 abstract class OverlayView  implements View.OnTouchListener {
-    private static final String TAG = OverlayService.class.getSimpleName();
+    protected static final String TAG = OverlayService.class.getSimpleName();
 
     final Context context;
     final WindowManager windowManager;
@@ -61,12 +61,12 @@ abstract class OverlayView  implements View.OnTouchListener {
 
     protected float px, py;
 
-    protected void startMovingOverlay(float x, float y) {
+    public void startMovingOverlay(float x, float y) {
         px = x;
         py = y;
     }
 
-    protected void moveOverlay(float newX, float newY) {
+    public void moveOverlay(float newX, float newY) {
         params.x += newX - px;
         params.y += newY - py;
         windowManager.updateViewLayout(floatyView, params);

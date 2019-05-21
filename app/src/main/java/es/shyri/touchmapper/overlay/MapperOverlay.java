@@ -15,8 +15,6 @@ import android.widget.FrameLayout;
 import es.shyri.touchmapper.R;
 
 public class MapperOverlay extends OverlayView {
-    private static final String TAG = OverlayService.class.getSimpleName();
-
     public MapperOverlay(Context context, WindowManager windowManager) {
         super(context, windowManager);
     }
@@ -53,6 +51,7 @@ public class MapperOverlay extends OverlayView {
 //            @Override
 //            public boolean dispatchTouchEvent(MotionEvent event) {
 //                Log.v(TAG, "Motion Source: " + event.getSource() + " Evt: " + event.toString());
+//                super.dispatchTouchEvent(event);
 //                return false;
 //            }
 
@@ -181,7 +180,8 @@ public class MapperOverlay extends OverlayView {
         windowManager.updateViewLayout(floatyView, params);
     }
 
-    protected void moveOverlay(float newX, float newY) {
+    @Override
+    public void moveOverlay(float newX, float newY) {
         params.x += newX - px;
         windowManager.updateViewLayout(floatyView, params);
     }
